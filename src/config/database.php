@@ -2,8 +2,8 @@
     function getDBConnection(): PDO{
         $host = "localhost";
         $db = "vuln_db";
-        $user = "root";
-        $pass = "admin";
+        $user = ""; # Tu credencial aqui
+        $pass = ""; # Tu credencial aqui
 
         $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 
