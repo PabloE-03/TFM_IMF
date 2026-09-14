@@ -3,6 +3,8 @@
     require_once __DIR__ . '/src/config/database.php';
     require_once __DIR__ . '/src/includes/auth_guard.php';
     require_once __DIR__ . '/src/includes/helpers.php';
+    require_once __DIR__ . '/src/includes/logger.php';
+
 
     // El pago requiere una sesión activa: sin ella no hay uuid_user con el que comparar.
     if (!isLoggedIn()) {
@@ -20,6 +22,7 @@
 
     // Misma whitelist estricta de formato UUID que en product.php.
     if (!isValidUuid($purchaseUuid)) {
+        logEvent('payment_attempt', 'failure', ['uuid_purchase' => $purchaseUuid, 'errors' => $errors]);
         header('Location: /index.php');
         exit;
     }
@@ -37,12 +40,14 @@
 
     // uuid con formato válido pero que no existe en base de datos.
     if (!$purchase) {
+        logEvent('payment_attempt', 'failure', ['uuid_purchase' => $purchaseUuid, 'errors' => $errors]);
         header('Location: /index.php');
         exit;
     }
 
     // La compra debe pertenecer al usuario de la sesión actual.
     if ($purchase['uuid_user'] !== $_SESSION['uuid']) {
+        logEvent('payment_attempt', 'failure', ['uuid_purchase' => $purchaseUuid, 'errors' => $errors]);
         header('Location: /index.php');
         exit;
     }
@@ -56,6 +61,12 @@
     $errors = [];
 
     if (isset($_POST['cancelar'])) {
+        // Eliminar la compra de la base de datos
+        $deleteStmt = $pdo->prepare('DELETE FROM purchases WHERE uuid = ? AND uuid_user = ?');
+        $deleteStmt->execute([$purchaseUuid, $_SESSION['uuid']]);
+        
+        logEvent('payment_canceled', 'success', ['uuid_purchase' => $purchaseUuid]);
+        // Redirigir al index después de eliminar
         header('Location: /index.php');
         exit;
     }
@@ -89,7 +100,7 @@
                  WHERE uuid = ? AND uuid_user = ?'
             );
             $update->execute([$card, $cvv, $expiration, $purchaseUuid, $_SESSION['uuid']]);
-
+            logEvent('payment_completed', 'success', ['uuid_purchase' => $purchaseUuid]);
             header('Location: /index.php');
             exit;
         }

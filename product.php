@@ -3,6 +3,8 @@
     require_once __DIR__ . '/src/config/database.php';
     require_once __DIR__ . '/src/includes/auth_guard.php';
     require_once __DIR__ . '/src/includes/helpers.php';
+    require_once __DIR__ . '/src/includes/logger.php';
+
 
     // Debe venir un uuid en el query string; si no hay nada que consultar, fuera.
     if (!isset($_GET['uuid']) || $_GET['uuid'] === '') {
@@ -62,6 +64,11 @@
                 $cantidad,
             ]);
 
+            logEvent('purchase_created', 'success', [
+                'uuid_purchase' => $purchaseUuid,
+                'uuid_product'  => $product['uuid'],
+                'cantidad'      => $cantidad,
+            ]);
             header('Location: /payment.php?uuid=' . urlencode($purchaseUuid));
             exit;
         }

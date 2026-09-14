@@ -15,6 +15,34 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `uuid` varchar(36) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('admin','client') NOT NULL DEFAULT 'client',
+  `access` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip_access` varchar(255) NOT NULL,
+  PRIMARY KEY (`uuid`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES ('7af42964-bc3d-47e3-a935-9ae5d4bbb568','Clara','clara@mail.com','$2y$10$MNjxh7yzpdaphjz9V1Sayu0CEy8YmrdXy2blUsz0E0Tx5kDtQ3wzy','client','2026-09-10 19:10:29','2026-09-10 19:10:16','127.0.0.1'),('9d7d3e0d-e774-4a1e-b35c-6b2ccf20a337','Bob','bob@mail.com','$2y$10$sFzxBCpWVAABAsbgajdeBu3UFL4b0FJCPpnTy7yD6UHXtv9ePWsdG','client','2026-09-10 19:36:36','2026-09-10 19:02:38','127.0.0.1'),('c0861ce2-e7fc-427e-9371-406b26c1ae40','admin','admin@email.com','$2y$10$t2JgpXXg.0.c8aeTxOYnqujEB7ctPNa8bAFrY1AHotizR4OHZKro6','admin','2026-09-10 19:37:56','2026-09-06 12:13:42','127.0.0.1');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
 --
 -- Table structure for table `products`
 --
@@ -41,6 +69,34 @@ LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
 INSERT INTO `products` VALUES ('1c8ea69a-652e-4d49-96fd-eb6de4763bd6','Mesa Comedor',460,'/uploads/products/mesa-comedor.jpg',NULL,'2026-09-05 16:12:02'),('26ef4dc6-6e48-4687-a10e-1783055ff186','Silla Oficina',200,'/uploads/products/silla-oficina.jpg',NULL,'2026-09-05 16:12:02'),('2d5d0afe-ebfe-4439-b221-2d114d74a5c2','Cama King',1300,'/uploads/products/cama-king.jpg',NULL,'2026-09-05 16:12:02'),('3aea2344-b6f0-4e6a-b390-15e3ca23a168','Nevera',1100,'/uploads/products/nevera.jpg',NULL,'2026-09-05 16:12:02'),('4293c729-657c-41fb-a024-1a4e5eb348e5','Lavabo',250,'/uploads/products/lavabo.jpg',NULL,'2026-09-05 16:12:02'),('714123f1-a794-4929-948d-c54baaa868d9','Estanteria',150,'/uploads/products/estanteria.jpg',NULL,'2026-09-05 16:12:02'),('73c3ebe8-d0de-4804-b8a4-4b78dac43820','Sofa',900,'/uploads/products/sofa.jpg',NULL,'2026-09-05 16:12:02'),('94afbd9e-c862-4279-a012-7ac06ffac153','Lampara',80,'/uploads/products/lampara.jpg',NULL,'2026-09-05 16:12:02'),('a72a9f97-e29c-43c7-893e-b250bb9fae51','Armario',700,'/uploads/products/armario.jpg',NULL,'2026-09-05 16:12:02'),('ccaad865-9feb-4cbd-974a-4cd1810a1c94','Banera',550,'/uploads/products/banera.jpg',NULL,'2026-09-05 16:12:02');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ideas`
+--
+
+DROP TABLE IF EXISTS `ideas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ideas` (
+  `uuid` varchar(36) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `file` varchar(255) NOT NULL,
+  `uuid_user` varchar(36) NOT NULL,
+  PRIMARY KEY (`uuid`),
+  KEY `fk_ideas_user` (`uuid_user`),
+  CONSTRAINT `fk_ideas_user` FOREIGN KEY (`uuid_user`) REFERENCES `users` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ideas`
+--
+
+LOCK TABLES `ideas` WRITE;
+/*!40000 ALTER TABLE `ideas` DISABLE KEYS */;
+INSERT INTO `ideas` VALUES ('c0b1ef8a-5363-4cd6-8b00-517a10ad90c0','Una litera de madera como material con un acabado en melamina, el color deseado es el roble, las escaleras de la litera estarían fusionadas','/uploads/ideas/idea_6aa306ff19aec9.77882349.jpg','9d7d3e0d-e774-4a1e-b35c-6b2ccf20a337');
+/*!40000 ALTER TABLE `ideas` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -84,33 +140,6 @@ UNLOCK TABLES;
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-  `uuid` varchar(36) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('admin','client') NOT NULL DEFAULT 'client',
-  `access` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `ip_access` varchar(255) NOT NULL,
-  PRIMARY KEY (`uuid`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('c0861ce2-e7fc-427e-9371-406b26c1ae40','admin','admin@email.com','$2y$10$t2JgpXXg.0.c8aeTxOYnqujEB7ctPNa8bAFrY1AHotizR4OHZKro6','admin','2026-09-06 14:53:49','2026-09-06 12:13:42','127.0.0.1');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -121,4 +150,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-06 18:47:03
+-- Dump completed on 2026-09-14 19:15:22

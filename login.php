@@ -2,6 +2,7 @@
 require_once __DIR__ . '/src/config/session.php';
 require_once __DIR__ . '/src/config/database.php';
 require_once __DIR__ . '/src/includes/auth_guard.php';
+require_once __DIR__ . '/src/includes/logger.php';
 
 // Si ya hay sesión activa, no tiene sentido ver el login
 if (isLoggedIn()) {
@@ -49,10 +50,12 @@ if (isset($_POST['login'])) {
             $update = $pdo->prepare('UPDATE users SET access = NOW(), ip_access = ? WHERE uuid = ?');
             $update->execute([$_SERVER['REMOTE_ADDR'], $user['uuid']]);
 
+            logEvent('login', 'success', ['username' => $username]);
             header('Location: /index.php');
             exit;
         } else {
             $errors[] = 'Usuario o contraseña incorrectos.';
+            logEvent('login', 'failure', ['username_attempted' => $username]);
         }
     }
 }
@@ -87,6 +90,7 @@ if (isset($_POST['register'])) {
             $insert->execute([$uuid, $username, $email, $hash, 'client', $_SERVER['REMOTE_ADDR']]);
 
             $isLogin = true; // tras registrar, mostramos directamente el login
+            logEvent('register', 'success', ['username' => $username, 'uuid' => $uuid]);
         }
     }
 }
